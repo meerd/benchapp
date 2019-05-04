@@ -1,0 +1,6 @@
+# Files
+*.o
+*~
+
+# Folders
+build/
