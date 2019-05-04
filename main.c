@@ -7,98 +7,20 @@
 
 #include "WjCryptLib_Md5.h"
 
-#define BENCH_TEST_SUCCESS              0
-#define BENCH_INLINE              
+#include "benchapp.h"
 
-#define TEST_STATE_IDLE                 0
-#define TEST_STATE_INIT                 1
-#define TEST_STATE_RUN                  2
-#define TEST_STATE_UNINIT               3
+INCLUDE_TEST(MD5);
 
-#define TEST_STATUS_NONE                0
-#define TEST_STATUS_INITIALIZED         1
-#define TEST_STATUS_RUNNING             2
-#define TEST_STATUS_UNINITIALIZED       3
+benchapp_init_t init_calls[] = {
+    &benchapp_init_MD5
+};
 
-#define DIFF_SEC			            2
-#define DIFF_MSEC			            1
-#define DIFF_USEC			            0
-
-typedef struct {
-  int state;
-  int status;
-
-  uint8_t *data;
-  uint32_t data_size;
-
-  unsigned long duration;
-  struct timespec ts_start;
-  struct timespec ts_end;
-
-  uint32_t cycle;
-} test_info_common_t;
-
-typedef struct {
-  test_info_common_t c;
-  
-  Md5Context ctx;
-  MD5_HASH digest;
-
-  int curr_block_index;
-  uint32_t block_size;
-} md5_test_info_t;
-
-
-
-void benchapp_test_runner()
-{
-    for (;;) {
-        bench_MD5(&md5_test_info);
-
-        switch (md5_test_info.c.status) {
-            case TEST_STATUS_INITIALIZED:
-                md5_test_info.c.duration = 5 * 1100 * 1900;
-                md5_test_info.c.state = TEST_STATE_RUN;
-                clock_gettime(CLOCK_MONOTONIC, &md5_test_info.c.ts_start);
-                break;
-
-            case TEST_STATUS_RUNNING:
-                clock_gettime(CLOCK_MONOTONIC, &md5_test_info.c.ts_end);
-                tdiff = (long) time_diff(&md5_test_info.c.ts_start, &md5_test_info.c.ts_end, DIFF_USEC);
-
-                if (tdiff >= md5_test_info.c.duration) {
-                    md5_test_info.c.state = TEST_STATE_UNINIT;
-                }
-
-                break;
-
-            case TEST_STATUS_UNINITIALIZED:
-            {
-                double throughput = (md5_test_info.block_size * md5_test_info.c.cycle / (1024. * 1024.));
-                double duration_in_secs = (md5_test_info.c.duration / 1000000.);
-
-                printf("Test finished! Number of %lu test calls in %1.2lf secs.\n", md5_test_info.c.cycle, duration_in_secs);
-                printf("Total Throughput: %1.2lf MB\n", throughput);
-                printf("Speed: %1.2lf MB/s\n", (throughput / duration_in_secs));
-                printf("MD5 Digest: ");
-
-                for (int i = 0; i < 16; ++i)
-                    printf("%02X", md5_test_info.digest.bytes[i]);
-
-                printf("\n");
-                return;
-                break;
-            }
-        }
-
-        usleep(1);
-    }
-}
+static int failures = 0;
 
 BENCH_INLINE float time_diff(struct timespec *start, struct timespec *end, int diff_type)
 {
-	float result = ((end->tv_sec - start->tv_sec) * 1000 * 1000 * 1000) + end->tv_nsec - start->tv_nsec;
-  
+    float result = ((end->tv_sec - start->tv_sec) * 1000 * 1000 * 1000) + end->tv_nsec - start->tv_nsec;
+
   switch (diff_type) {
   case DIFF_SEC:
     result /= 1000;
@@ -114,20 +36,70 @@ BENCH_INLINE float time_diff(struct timespec *start, struct timespec *end, int d
   return result;
 }
 
+void benchapp_test_runner(test_info_common_t *test_info)
+{
+    if (test_info) {
+        test_info->state = TEST_STATE_INIT;
+        for (;;) {
+            if (BENCH_TEST_SUCCESS != test_info->runner(test_info)) {
+                benchapp_printf("Test (%s) has failed at cycle: %d\n", test_info->name, test_info->cycle);
+                ++failures;
+                return;
+            }
+
+            switch (test_info->status) {
+                case TEST_STATUS_INITIALIZED:
+                    test_info->state = TEST_STATE_RUN;
+                    clock_gettime(CLOCK_MONOTONIC, &test_info->ts_start);
+                    break;
+
+                case TEST_STATUS_RUNNING:
+                   {
+                        clock_gettime(CLOCK_MONOTONIC, &test_info->ts_end);
+                        long tdiff = (long) time_diff(&test_info->ts_start, &test_info->ts_end, DIFF_USEC);
+
+                        if (tdiff >= test_info->duration) {
+                            test_info->state = TEST_STATE_UNINIT;
+                        }
+                   }
+                   break;
+
+                case TEST_STATUS_UNINITIALIZED:
+                    {
+                        double duration_in_secs = (test_info->duration / 1000000.);
+
+                        benchapp_printf("Test finished! Number of %lu test calls in %1.2lf secs.\n", test_info->cycle, duration_in_secs);
+                        test_info->state = TEST_STATE_IDLE;
+                        return;
+                    }
+                    break;
+            }
+
+            usleep(1);
+        }
+    }
+}
+
+void app_exit(void)
+{
+    if (0 == failures)
+        benchapp_printf("Application has exited successfully.\n");
+    else
+        benchapp_printf("Application has exited with %d failures!\n", failures);
+}
+
 int main(void)
 {
-  printf("Hello world!\n");
+  benchapp_logf("Application has started!");
 
+  atexit(app_exit);
 
-  long tdiff;
-
-  md5_test_info_t md5_test_info;
-  memset(&md5_test_info, 0x00, sizeof(md5_test_info_t));
-  
-  md5_test_info.c.state = TEST_STATE_INIT;
-
-
+  for (int i = 0; i < sizeof(init_calls) / sizeof(init_calls[0]); ++i) {
+      if (init_calls[i]) {
+          test_info_common_t *info = init_calls[i]();
+          benchapp_test_runner(info);
+      }
+  }
 
   return 0;
 }
-
