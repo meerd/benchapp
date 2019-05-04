@@ -1,6 +1,7 @@
 WORKING_DIRECTORY := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 all:
+	(cd $(WORKING_DIRECTORY)/external/WjCryptLib && mkdir -p build/ && cd build/ && cmake .. && make)
 	(cd $(WORKING_DIRECTORY) && mkdir -p build/ && cd build/ && cmake .. && make)
 
 run:
