@@ -1,0 +1,103 @@
+menu "MD5 Benchmark"
+
+config BENCHMARK_MD5
+    bool "Enable MD5 Benchmark"
+
+#--------------------------------
+
+config BENCHMARK_MD5_RECIPE1
+    bool "Enable test recipe 1"
+    default y
+    depends on BENCHMARK_MD5
+
+choice
+    prompt "Recipe-1 Type"
+    depends on BENCHMARK_MD5_RECIPE1
+    default BENCHMARK_MD5_R1_TIME_LIMITED
+    help
+        Time Limited:
+        Execution Limited:
+
+config BENCHMARK_MD5_R1_TIME_LIMITED:
+    bool "Time Limited"
+
+config BENCHMARK_MD5_R1_EXEC_LIMITED:
+    bool "Execution Limited"
+
+endchoice 
+
+config BENCHMARK_MD5_RECIPE1_TIME
+    int "Time Limit (msecs)"
+    default 1000
+    depends on BENCHMARK_MD5_RECIPE1 && BENCHMARK_MD5_R1_TIME_LIMITED
+
+config BENCHMARK_MD5_RECIPE1_CALLS
+    int "Exec Limit (cals)"
+    default 10000
+    depends on BENCHMARK_MD5_RECIPE1 && BENCHMARK_MD5_R1_EXEC_LIMITED
+    
+#--------------------------------
+
+config BENCHMARK_MD5_RECIPE2
+    bool "Enable test recipe 2"
+    default y
+    depends on BENCHMARK_MD5
+
+choice
+    prompt "Recipe-2 Type"
+    depends on BENCHMARK_MD5_RECIPE2
+    default BENCHMARK_MD5_R2_EXEC_LIMITED
+    help
+        Time Limited:
+        Execution Limited:
+
+config BENCHMARK_MD5_R2_TIME_LIMITED:
+    bool "Time Limited"
+
+config BENCHMARK_MD5_R2_EXEC_LIMITED:
+    bool "Execution Limited"
+
+endchoice 
+
+config BENCHMARK_MD5_RECIPE2_TIME
+    int "Time Limit (msecs)"
+    default 1000
+    depends on BENCHMARK_MD5_RECIPE2 && BENCHMARK_MD5_R2_TIME_LIMITED
+
+config BENCHMARK_MD5_RECIPE2_CALLS
+    int "Exec Limit (cals)"
+    default 10000
+    depends on BENCHMARK_MD5_RECIPE2 && BENCHMARK_MD5_R2_EXEC_LIMITED
+
+#--------------------------------
+
+config BENCHMARK_MD5_RECIPE3
+    bool "Enable test recipe 3"
+    default n
+    depends on BENCHMARK_MD5
+
+choice
+    prompt "Recipe-3 Type"
+    depends on BENCHMARK_MD5_RECIPE3
+    help
+        Time Limited:
+        Execution Limited:
+
+config BENCHMARK_MD5_R3_TIME_LIMITED:
+    bool "Time Limited"
+
+config BENCHMARK_MD5_R3_EXEC_LIMITED:
+    bool "Execution Limited"
+
+endchoice 
+
+config BENCHMARK_MD5_RECIPE3_TIME
+    int "Time Limit (msecs)"
+    depends on BENCHMARK_MD5_RECIPE3 && BENCHMARK_MD5_R3_TIME_LIMITED
+
+config BENCHMARK_MD5_RECIPE3_CALLS
+    int "Exec Limit (cals)"
+    depends on BENCHMARK_MD5_RECIPE3 && BENCHMARK_MD5_R3_EXEC_LIMITED
+    
+endmenu
+

@@ -20,12 +20,13 @@ typedef struct {
 
   int curr_block_index;
   uint32_t block_size;
+
+  test_recipe_t recipes[5];
 } md5_test_info_t;
 
 int benchapp_run_MD5(void *arg)
 {
   md5_test_info_t *info = (md5_test_info_t *) arg;
-  ++info->c.cycle;
   
   switch (info->c.state) {
   case TEST_STATE_INIT:
@@ -49,9 +50,11 @@ int benchapp_run_MD5(void *arg)
   case TEST_STATE_UNINIT:
     {
         Md5Finalise(&info->ctx, &info->digest);
+#if 0
         free(info->data);
         info->data = 0;
         info->data_size = 0;
+#endif
         info->c.status = TEST_STATUS_UNINITIALIZED;
 
         benchapp_printf("MD5 Digest: ");
@@ -64,7 +67,6 @@ int benchapp_run_MD5(void *arg)
 
         benchapp_printf("Total Throughput: %1.2lf MB\n", throughput);
         benchapp_printf("Speed: %1.2lf MB/s\n", (throughput / duration_in_secs));
-
     }
     break;
 
@@ -75,13 +77,15 @@ int benchapp_run_MD5(void *arg)
 
 void* benchapp_init_MD5(void)
 {
+    /* Config */
+    /* Config */
+
     md5_test_info_t *info = (md5_test_info_t *) benchapp_malloc(sizeof(md5_test_info_t));
 
     if (info) {
         strcpy(info->c.name, "MD5");
 
         info->c.runner = &benchapp_run_MD5;
-        info->c.duration = 5 * 1000 * 1000;
 
         info->curr_block_index = 0;
         info->block_size = 4096;
@@ -91,6 +95,28 @@ void* benchapp_init_MD5(void)
 
         for (int i = 0; i < info->data_size; ++i)
           info->data[i] = rand() % 256;
+
+        info->c.recipes = info->recipes;
+        info->c.current_recipe_index = 0;
+        info->c.max_recipe = 4;
+
+        memset(info->recipes, 0x00, sizeof(info->recipes));
+
+        strcpy(info->recipes[0].name, "1 Sec");
+        info->recipes[0].type = RTYPE_TIME_LIMITED;
+        info->recipes[0].duration = 1 * 1000 * 1000;
+
+        strcpy(info->recipes[1].name, "10K Calls");
+        info->recipes[1].type  = RTYPE_EXECUTION_LIMITED;
+        info->recipes[1].max_cycle = 10000;
+
+        strcpy(info->recipes[2].name, "5 Sec");
+        info->recipes[2].type = RTYPE_TIME_LIMITED;
+        info->recipes[2].duration = 5 * 1000 * 1000;
+
+        strcpy(info->recipes[3].name, "100K Calls");
+        info->recipes[3].type  = RTYPE_EXECUTION_LIMITED;
+        info->recipes[3].max_cycle = 100000;
     }
 
     return info;

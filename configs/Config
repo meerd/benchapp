@@ -23,6 +23,4 @@ config PLATFORM_WINDOWS
 
 endchoice
 
-config BENCHMARK_MD5
-    bool "MD5 Benchmark"
-
+source "Config.md5"
