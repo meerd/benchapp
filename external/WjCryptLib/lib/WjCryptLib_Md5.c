@@ -12,7 +12,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "WjCryptLib_Md5.h"
-#include <memory.h>
+#include "ba_port.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  INTERNAL FUNCTIONS
@@ -51,7 +51,7 @@ void*
     (
         Md5Context*     ctx,
         void const*     data,
-        uintmax_t       size
+        uint64_t        size
     )
 {
     uint8_t*     ptr;
@@ -233,11 +233,11 @@ void
 
         if( BufferSize < free )
         {
-            memcpy( &Context->buffer[used], Buffer, BufferSize );
+            ba_memcpy( &Context->buffer[used], Buffer, BufferSize );
             return;
         }
 
-        memcpy( &Context->buffer[used], Buffer, free );
+        ba_memcpy( &Context->buffer[used], Buffer, free );
         Buffer = (uint8_t*)Buffer + free;
         BufferSize -= free;
         TransformFunction(Context, Context->buffer, 64);
@@ -249,7 +249,7 @@ void
         BufferSize &= 0x3f;
     }
 
-    memcpy( Context->buffer, Buffer, BufferSize );
+    ba_memcpy( Context->buffer, Buffer, BufferSize );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -276,13 +276,13 @@ void
 
     if(free < 8)
     {
-        memset( &Context->buffer[used], 0, free );
+        ba_memset( &Context->buffer[used], 0, free );
         TransformFunction( Context, Context->buffer, 64 );
         used = 0;
         free = 64;
     }
 
-    memset( &Context->buffer[used], 0, free - 8 );
+    ba_memset( &Context->buffer[used], 0, free - 8 );
 
     Context->lo <<= 3;
     Context->buffer[56] = (uint8_t)( Context->lo );

@@ -17,8 +17,7 @@
 
 #include "WjCryptLib_AesOfb.h"
 #include "WjCryptLib_Aes.h"
-#include <stdint.h>
-#include <memory.h>
+#include "ba_port.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  MACROS
@@ -79,7 +78,7 @@ void
 {
     // Setup context values
     Context->Aes = *InitialisedAesContext;
-    memcpy( Context->CurrentCipherBlock, IV, sizeof(Context->CurrentCipherBlock) );
+    ba_memcpy( Context->CurrentCipherBlock, IV, sizeof(Context->CurrentCipherBlock) );
     Context->IndexWithinCipherBlock = 0;
 
     // Generate the first cipher block of the stream.
@@ -189,7 +188,7 @@ void
         uint32_t            Size                    // [in]
     )
 {
-    memset( Buffer, 0, Size );
+    ba_memset( Buffer, 0, Size );
     AesOfbXor( Context, Buffer, Buffer, Size );
 }
 

@@ -18,8 +18,7 @@
 
 #include "WjCryptLib_AesCbc.h"
 #include "WjCryptLib_Aes.h"
-#include <stdint.h>
-#include <memory.h>
+#include "ba_port.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  MACROS
@@ -78,7 +77,7 @@ void
 {
     // Setup context values
     Context->Aes = *InitialisedAesContext;
-    memcpy( Context->PreviousCipherBlock, IV, sizeof(Context->PreviousCipherBlock) );
+    ba_memcpy( Context->PreviousCipherBlock, IV, sizeof(Context->PreviousCipherBlock) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,7 +147,7 @@ int
         AesEncryptInPlace( &Context->Aes, Context->PreviousCipherBlock );
 
         // Output cipher block
-        memcpy( (uint8_t*)OutBuffer + offset, Context->PreviousCipherBlock, AES_BLOCK_SIZE );
+        ba_memcpy( (uint8_t*)OutBuffer + offset, Context->PreviousCipherBlock, AES_BLOCK_SIZE );
 
         offset += AES_BLOCK_SIZE;
     }
@@ -187,8 +186,8 @@ int
     for( i=0; i<numBlocks; i++ )
     {
         // Copy previous cipher block and place current one in context
-        memcpy( previousCipherBlock, Context->PreviousCipherBlock, AES_BLOCK_SIZE );
-        memcpy( Context->PreviousCipherBlock, (uint8_t*)InBuffer + offset, AES_BLOCK_SIZE );
+        ba_memcpy( previousCipherBlock, Context->PreviousCipherBlock, AES_BLOCK_SIZE );
+        ba_memcpy( Context->PreviousCipherBlock, (uint8_t*)InBuffer + offset, AES_BLOCK_SIZE );
 
         // Decrypt cipher block
         AesDecrypt( &Context->Aes, Context->PreviousCipherBlock, (uint8_t*)OutBuffer + offset );

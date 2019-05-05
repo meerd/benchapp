@@ -26,4 +26,8 @@ menuconfig: b_prepare menuconfig_build
 	(cd $(WORKING_DIRECTORY) && ./tools/menuconfig/build/mconf configs/Config)
 
 run:
-	$(WORKING_DIRECTORY)/build/benchapp	
+	$(WORKING_DIRECTORY)/build/benchapp
+
+distclean:
+	rm -rf $(WORKING_DIRECTORY)/build
+	rm -rf $(WORKING_DIRECTORY)/external/WjCryptLib/build	

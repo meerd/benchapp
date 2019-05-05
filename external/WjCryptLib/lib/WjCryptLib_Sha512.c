@@ -13,7 +13,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "WjCryptLib_Sha512.h"
-#include <memory.h>
+#include "ba_port.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  MACROS
@@ -202,7 +202,7 @@ void
         else
         {
            n = MIN( BufferSize, (BLOCK_SIZE - Context->curlen) );
-           memcpy( Context->buf + Context->curlen, Buffer, (size_t)n );
+           ba_memcpy( Context->buf + Context->curlen, Buffer, (size_t)n );
            Context->curlen += n;
            Buffer = (uint8_t*)Buffer + n;
            BufferSize -= n;

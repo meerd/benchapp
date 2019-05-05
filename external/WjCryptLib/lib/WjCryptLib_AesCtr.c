@@ -17,8 +17,7 @@
 
 #include "WjCryptLib_AesCtr.h"
 #include "WjCryptLib_Aes.h"
-#include <stdint.h>
-#include <memory.h>
+#include "ba_port.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  MACROS
@@ -51,7 +50,7 @@ void
     )
 {
     // Build block by first copying in the IV
-    memcpy( Context->CurrentCipherBlock, Context->IV, AES_CTR_IV_SIZE );
+    ba_memcpy( Context->CurrentCipherBlock, Context->IV, AES_CTR_IV_SIZE );
 
     // Now place in the counter in Big Endian form
     STORE64H( Context->CurrentCipherBlockIndex, Context->CurrentCipherBlock + AES_CTR_IV_SIZE );
@@ -103,7 +102,7 @@ void
 {
     // Setup context values
     Context->Aes = *InitialisedAesContext;
-    memcpy( Context->IV, IV, AES_CTR_IV_SIZE );
+    ba_memcpy( Context->IV, IV, AES_CTR_IV_SIZE );
     Context->StreamIndex = 0;
     Context->CurrentCipherBlockIndex = 0;
 
@@ -214,7 +213,7 @@ void
 
     // Copy the IV into the first half of the preCipherBlock. When built for OpenMP preCipherBlock will be copied into
     // a local version within the loop.
-    memcpy( preCipherBlock, Context->IV, AES_CTR_IV_SIZE );
+    ba_memcpy( preCipherBlock, Context->IV, AES_CTR_IV_SIZE );
 
     // Now start generating new cipher blocks as required.
     #ifdef _OPENMP
@@ -244,7 +243,7 @@ void
     if( numIterations > 0 )
     {
         Context->CurrentCipherBlockIndex = cipherBlockIndex;
-        memcpy( Context->CurrentCipherBlock, encCipherBlock, AES_BLOCK_SIZE );
+        ba_memcpy( Context->CurrentCipherBlock, encCipherBlock, AES_BLOCK_SIZE );
     }
 }
 
@@ -262,7 +261,7 @@ void
         uint32_t            Size                    // [in]
     )
 {
-    memset( Buffer, 0, Size );
+    ba_memset( Buffer, 0, Size );
     AesCtrXor( Context, Buffer, Buffer, Size );
 }
 

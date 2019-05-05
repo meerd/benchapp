@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project( WjCryptLib )
 
+add_definitions(-include ${CMAKE_CURRENT_SOURCE_DIR}/../../ba_std.h)
+
 # WjCryptLib Static Library
 add_library( WjCryptLib STATIC
     lib/WjCryptLib_Aes.h
@@ -22,6 +24,9 @@ add_library( WjCryptLib STATIC
     lib/WjCryptLib_Sha256.c
     lib/WjCryptLib_Sha512.h
     lib/WjCryptLib_Sha512.c )
+
 target_include_directories( WjCryptLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib )
+target_include_directories( WjCryptLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../ )
+
 set_target_properties ( WjCryptLib PROPERTIES FOLDER lib )
 

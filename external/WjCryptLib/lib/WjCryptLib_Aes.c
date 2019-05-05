@@ -24,8 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "WjCryptLib_Aes.h"
-#include <stdint.h>
-#include <memory.h>
+#include "ba_port.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  CONSTANTS
@@ -706,7 +705,7 @@ int
     )
 {
     uint8_t const*  key = Key;
-    uint_fast32_t   i;
+    uint32_t        i;
     uint32_t        temp;
     uint32_t*       rk;
     uint32_t*       rrk;
@@ -851,7 +850,7 @@ void
     uint32_t        t2;
     uint32_t        t3;
     uint32_t const* rk;
-    uint_fast32_t   r;
+    uint32_t   r;
 
     rk = Context->eK;
 
@@ -924,7 +923,7 @@ void
     uint32_t        t2;
     uint32_t        t3;
     uint32_t const* rk;
-    uint_fast32_t   r;
+    uint32_t   r;
 
     rk = Context->dK;
 

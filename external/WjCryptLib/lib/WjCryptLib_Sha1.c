@@ -15,8 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "WjCryptLib_Sha1.h"
-#include <memory.h>
-
+#include "ba_port.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  DEFINES
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +73,7 @@ typedef union
 // Loads the 128 bits from ByteArray into WordArray, treating ByteArray as big endian data
 #ifdef USE_LITTLE_ENDIAN_SHORTCUT
     #define Load128BitsAsWords( WordArray, ByteArray )  \
-        memcpy( WordArray, ByteArray, 64 )
+        ba_memcpy( WordArray, ByteArray, 64 )
 #else
     #define Load128BitsAsWords( WordArray, ByteArray )      \
     {                                                       \
@@ -198,7 +197,7 @@ void
     if( (j + BufferSize) > 63 )
     {
         i = 64 - j;
-        memcpy( &Context->Buffer[j], Buffer, i );
+        ba_memcpy( &Context->Buffer[j], Buffer, i );
         TransformFunction(Context->State, Context->Buffer);
         for( ; i + 63 < BufferSize; i += 64 )
         {
@@ -211,7 +210,7 @@ void
         i = 0;
     }
 
-    memcpy( &Context->Buffer[j], &((uint8_t*)Buffer)[i], BufferSize - i );
+    ba_memcpy( &Context->Buffer[j], &((uint8_t*)Buffer)[i], BufferSize - i );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
