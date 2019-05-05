@@ -1,0 +1,9 @@
+#
+# Automatically generated file; DO NOT EDIT.
+# Benchapp Test Configuration
+#
+CONFIG_CONFIG_CONFIGURED=y
+CONFIG_CROSS_PREFIX=""
+CONFIG_PLATFORM_LINUX=y
+# CONFIG_PLATFORM_WINDOWS is not set
+CONFIG_BENCHMARK_MD5=y

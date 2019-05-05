@@ -1,0 +1,28 @@
+
+mainmenu "Benchapp Test Configuration"
+
+config CONFIG_CONFIGURED
+    bool
+    default y
+
+config CROSS_PREFIX
+    string "Cross compile prefix"
+
+choice
+    prompt "Target Platform Selection"
+    default PLATFORM_LINUX
+    help
+	linux:
+	windows:
+
+config PLATFORM_LINUX
+    bool "linux"
+
+config PLATFORM_WINDOWS
+    bool "windows"
+
+endchoice
+
+config BENCHMARK_MD5
+    bool "MD5 Benchmark"
+
