@@ -7,6 +7,8 @@
 *.files
 *.includes
 *.autosave
+.config
+.config.old
 
 # Folders
 build/
