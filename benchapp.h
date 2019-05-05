@@ -24,6 +24,9 @@
 #define DIFF_MSEC			            1
 #define DIFF_USEC			            0
 
+#define CSTR(a) BCSTR(a)
+#define BCSTR(a) #a
+
 #ifndef RELEASE_MODE
 #define benchapp_logf(...) do { \
                             const char *f = __FILE__; \

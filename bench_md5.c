@@ -98,25 +98,46 @@ void* benchapp_init_MD5(void)
 
         info->c.recipes = info->recipes;
         info->c.current_recipe_index = 0;
-        info->c.max_recipe = 4;
+        info->c.max_recipe = 0;
 
         memset(info->recipes, 0x00, sizeof(info->recipes));
 
-        strcpy(info->recipes[0].name, "1 Sec");
-        info->recipes[0].type = RTYPE_TIME_LIMITED;
-        info->recipes[0].duration = 1 * 1000 * 1000;
 
-        strcpy(info->recipes[1].name, "10K Calls");
-        info->recipes[1].type  = RTYPE_EXECUTION_LIMITED;
-        info->recipes[1].max_cycle = 10000;
+#ifdef CONFIG_BENCHMARK_MD5_RECIPE1
+        strcpy(info->recipes[info->c.max_recipe].name, CSTR(CONFIG_BENCHMARK_MD5_R1_NAME));
+#ifdef CONFIG_BENCHMARK_MD5_R1_TIME_LIMITED
+        info->recipes[info->c.max_recipe].type = RTYPE_TIME_LIMITED;
+        info->recipes[info->c.max_recipe].duration = CONFIG_BENCHMARK_MD5_RECIPE1_TIME * 1000;
+#else
+        info->recipes[info->c.max_recipe].type = RTYPE_EXECUTION_LIMITED;
+        info->recipes[info->c.max_recipe].max_cycle = CONFIG_BENCHMARK_MD5_RECIPE1_CALLS;
+#endif
+        ++info->c.max_recipe;
+#endif
 
-        strcpy(info->recipes[2].name, "5 Sec");
-        info->recipes[2].type = RTYPE_TIME_LIMITED;
-        info->recipes[2].duration = 5 * 1000 * 1000;
+#ifdef CONFIG_BENCHMARK_MD5_RECIPE2
+        strcpy(info->recipes[info->c.max_recipe].name, CSTR(CONFIG_BENCHMARK_MD5_R2_NAME));
+#ifdef CONFIG_BENCHMARK_MD5_R2_TIME_LIMITED
+        info->recipes[info->c.max_recipe].type = RTYPE_TIME_LIMITED;
+        info->recipes[info->c.max_recipe].duration = CONFIG_BENCHMARK_MD5_RECIPE2_TIME * 1000;
+#else
+        info->recipes[info->c.max_recipe].type = RTYPE_EXECUTION_LIMITED;
+        info->recipes[info->c.max_recipe].max_cycle = CONFIG_BENCHMARK_MD5_RECIPE2_CALLS;
+#endif
+        ++info->c.max_recipe;
+#endif
 
-        strcpy(info->recipes[3].name, "100K Calls");
-        info->recipes[3].type  = RTYPE_EXECUTION_LIMITED;
-        info->recipes[3].max_cycle = 100000;
+#ifdef CONFIG_BENCHMARK_MD5_RECIPE3
+        strcpy(info->recipes[info->c.max_recipe].name, CSTR(CONFIG_BENCHMARK_MD5_R3_NAME));
+#ifdef CONFIG_BENCHMARK_MD5_R3_TIME_LIMITED
+        info->recipes[info->c.max_recipe].type = RTYPE_TIME_LIMITED;
+        info->recipes[info->c.max_recipe].duration = CONFIG_BENCHMARK_MD5_RECIPE3_TIME * 1000;
+#else
+        info->recipes[info->c.max_recipe].type = RTYPE_EXECUTION_LIMITED;
+        info->recipes[info->c.max_recipe].max_cycle = CONFIG_BENCHMARK_MD5_RECIPE3_CALLS;
+#endif
+        ++info->c.max_recipe;
+#endif
     }
 
     return info;
