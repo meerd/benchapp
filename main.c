@@ -21,19 +21,19 @@ BENCH_INLINE float time_diff(struct timespec *start, struct timespec *end, int d
 {
     float result = ((end->tv_sec - start->tv_sec) * 1000 * 1000 * 1000) + end->tv_nsec - start->tv_nsec;
 
-  switch (diff_type) {
-  case DIFF_SEC:
-    result /= 1000;
-  case DIFF_MSEC:
-    result /= 1000;
-  case DIFF_USEC:
+    switch (diff_type) {
+    case DIFF_SEC:
+        result /= 1000;
+    case DIFF_MSEC:
+        result /= 1000;
+    case DIFF_USEC:
 
-    result /= 1000;
-  default:
-    break;
-  }
+        result /= 1000;
+    default:
+        break;
+    }
 
-  return result;
+    return result;
 }
 
 void benchapp_test_runner(test_info_common_t *test_info)
