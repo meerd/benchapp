@@ -1,6 +1,8 @@
 #ifndef BATYPES_H_INCLUDED
 #define BATYPES_H_INCLUDED
 
+#define VARIATION_MAX                   16
+
 #define DIFF_USEC			            0
 #define DIFF_MSEC			            1
 #define DIFF_SEC			            2
@@ -45,6 +47,11 @@ typedef struct {
   unsigned long duration;
 
   benchapp_run_t   runner;
+
+  uint8_t nb_variations;
+  uint8_t variations[VARIATION_MAX];
+  uint8_t variation_names[VARIATION_MAX][32];
+  int curr_variation_index;
 
   int current_recipe_index;
   int max_recipe;

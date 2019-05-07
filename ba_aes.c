@@ -9,8 +9,8 @@
 typedef struct {
   test_info_common_t c;
   
-  AesContext ctx[AES_KEYSIZE_TYPE_COUNT]; /* 128 | 192 | 256 */
-  AesCbcContext cbc_ctx[AES_KEYSIZE_TYPE_COUNT]; /* 128 | 192 | 256 */
+  AesContext ctx; /* 128 | 192 | 256 */
+  AesCbcContext cbc_ctx; /* 128 | 192 | 256 */
 
   uint8_t key[AES_KEY_SIZE_256];
   uint8_t iv[AES_CBC_IV_SIZE];
@@ -29,31 +29,37 @@ int benchapp_run_AES(void *arg)
   
   switch (info->c.state) {
   case TEST_STATE_INIT:
-    { 
+    {
       int max_key_length = AES_KEY_SIZE_256;
+      int key_size;
 
       for (int j = 0; j < max_key_length; ++j) {
         info->key[j] = ba_rand() % 256;
-
-        switch (j) {
-        case AES_KEY_SIZE_128:
-            AesInitialise(&info->ctx[0], info->key, AES_KEY_SIZE_128);
-            AesCbcInitialise(&info->cbc_ctx[0], &info->ctx[0], info->key);
-
-            break;
-        case AES_KEY_SIZE_192:
-            AesInitialise(&info->ctx[1], info->key, AES_KEY_SIZE_192);
-            AesCbcInitialise(&info->cbc_ctx[1], &info->ctx[1], info->key);
-            break;
-        }
       }
 
       for (int j = 0; j < AES_CBC_IV_SIZE; ++j) {
         info->iv[j] = ba_rand() % 256;
       }
 
-      AesInitialise(&info->ctx[2], info->key, AES_KEY_SIZE_256);
-      AesCbcInitialise(&info->cbc_ctx[2], &info->ctx[2], info->iv);
+      switch (info->c.curr_variation_index) {
+      case 0:
+          key_size = AES_KEY_SIZE_128;
+          benchapp_logf("Variation Key Size: 128 Bits");
+          break;
+
+      case 1:
+          key_size = AES_KEY_SIZE_192;
+          benchapp_logf("Variation Key Size: 192 Bits");
+          break;
+
+      case 2:
+          key_size = AES_KEY_SIZE_256;
+          benchapp_logf("Variation Key Size: 256 Bits");
+          break;
+      }
+
+      AesInitialise(&info->ctx, info->key, key_size);
+      AesCbcInitialise(&info->cbc_ctx, &info->ctx, info->key);
 
       info->c.status = TEST_STATUS_INITIALIZED;
     }
@@ -65,10 +71,10 @@ int benchapp_run_AES(void *arg)
       for (int i = 0; i < info->data_size; ++i)
           info->data[i] = ba_rand() % 256;
 #else
-      memcpy(info->data, info->encrypted, info->data_size);
+      ba_memcpy(info->data, info->encrypted, info->data_size);
 #endif
 
-      AesCbcEncrypt(&info->cbc_ctx[1], info->data, info->encrypted, info->data_size);
+      AesCbcEncrypt(&info->cbc_ctx, info->data, info->encrypted, info->data_size);
       info->c.status = TEST_STATUS_RUNNING;
     }
     break;
@@ -95,6 +101,8 @@ void* benchapp_init_AES(void)
     aes_test_info_t *info = (aes_test_info_t *) ba_malloc(sizeof(aes_test_info_t));
 
     if (info) {
+        ba_memset(info, 0x00, sizeof(aes_test_info_t));
+
         ba_strcpy(info->c.name, "AES");
         info->c.runner = &benchapp_run_AES;
 
@@ -109,15 +117,30 @@ void* benchapp_init_AES(void)
         ba_memset(info->encrypted, 0x00, info->data_size);
         ba_memset(info->decrypted, 0x00, info->data_size);
 
+        ba_memset(info->c.variations, 0x00, sizeof(info->c.variations));
+        ba_memset(info->c.variation_names, 0x00, sizeof(info->c.variation_names));
+
+        info->c.curr_variation_index = 0;
+        info->c.nb_variations = 3;
+        info->c.variations[0] = 1;
+        ba_strcpy(info->c.variation_names[0], "128 Bit");
+        info->c.variations[1] = 1;
+        ba_strcpy(info->c.variation_names[1], "192 Bit");
+        info->c.variations[2] = 1;
+        ba_strcpy(info->c.variation_names[2], "256 Bit");
+
+        ba_memset(info->recipes, 0x00, sizeof(info->recipes));
         info->c.recipes = info->recipes;
         info->c.current_recipe_index = 0;
         info->c.max_recipe = 0;
 
-        ba_memset(info->recipes, 0x00, sizeof(info->recipes));
-
-        ba_strcpy(info->recipes[info->c.max_recipe].name, "AES");
+        ba_strcpy(info->recipes[info->c.max_recipe].name, "AES Time Limited");
         info->recipes[info->c.max_recipe].type = RTYPE_TIME_LIMITED;
         info->recipes[info->c.max_recipe].duration = 5000 * 1000;
+        ++info->c.max_recipe;
+        ba_strcpy(info->recipes[info->c.max_recipe].name, "AES Execution Limited");
+        info->recipes[info->c.max_recipe].type = RTYPE_EXECUTION_LIMITED;
+        info->recipes[info->c.max_recipe].max_cycle = 1000;
         ++info->c.max_recipe;
     }
 

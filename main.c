@@ -88,6 +88,18 @@ static void app_exit(void)
     ba_printf("|*************************************|\n");
 }
 
+static void run_recipes(test_info_common_t *info)
+{
+    for (int r = 0; r < info->max_recipe; ++r) {
+        if (RTYPE_NONE != info->recipes[r].type) {
+            info->current_recipe_index = r;
+            ba_printf("Running recipe: %s\n", info->recipes[info->current_recipe_index].name);
+            benchapp_test_runner(info);
+            ba_printf("--------------------------------------\n");
+        }
+    }
+}
+
 int main(void)
 {
   ba_printf("|*************************************|\n");
@@ -98,14 +110,21 @@ int main(void)
       if (init_calls[i]) {
           test_info_common_t *info = init_calls[i]();
           ba_printf("######################################\n");
-          ba_printf("Test: %s (Recipes: %d)\n", info->name, info->max_recipe);
-          for (int r = 0; r < info->max_recipe; ++r) {
-              if (RTYPE_NONE != info->recipes[r].type) {
-                  info->current_recipe_index = r;
-                  ba_printf("Running recipe: %s\n", info->recipes[info->current_recipe_index].name);
-                  benchapp_test_runner(info);
-                  ba_printf("--------------------------------------\n");
+          if (info->nb_variations) {
+              /* Execute Variations */
+              for (int v = 0; v < VARIATION_MAX; ++v) {
+                  if (info->variations[v]) {
+                      info->curr_variation_index = v;
+                      ba_printf("Test: %s / Variation: %s / Number of Recipes: %d\n", info->name, info->variation_names[v], info->max_recipe);
+                      /* Recipes */
+                      run_recipes(info);
+                  }
               }
+          } else {
+              /* No variation exists. */
+              ba_printf("Test: %s / Number of Recipes: %d\n", info->name, info->max_recipe);
+              /* Recipes */
+              run_recipes(info);
           }
           ba_printf("######################################\n");
           uninit_calls[i](info);
