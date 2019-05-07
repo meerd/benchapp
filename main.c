@@ -1,13 +1,16 @@
 #include "benchapp.h"
 
 INCLUDE_TEST(MD5);
+INCLUDE_TEST(AES);
 
 benchapp_init_t init_calls[] = {
-    &benchapp_init_MD5
+    &benchapp_init_MD5,
+    &benchapp_init_AES
 };
 
 benchapp_uninit_t uninit_calls[] = {
-    &benchapp_uninit_MD5
+    &benchapp_uninit_MD5,
+    &benchapp_init_AES
 };
 
 static int failures = 0;
@@ -33,7 +36,7 @@ static void benchapp_test_runner(test_info_common_t *test_info)
 
                 case TEST_STATUS_RUNNING:
                     {
-                        test_recipe_t *current_recipe =&test_info->recipes[test_info->current_recipe_index];
+                        test_recipe_t *current_recipe = &test_info->recipes[test_info->current_recipe_index];
 
                         ba_clock_gettime(&test_info->ts_end);
                         long tdiff = (long) ba_time_diff(&test_info->ts_start, &test_info->ts_end, DIFF_USEC);
@@ -97,7 +100,7 @@ int main(void)
           ba_printf("######################################\n");
           ba_printf("Test: %s (Recipes: %d)\n", info->name, info->max_recipe);
           for (int r = 0; r < info->max_recipe; ++r) {
-              if (RTYPE_NONE != info->recipes[i].type) {
+              if (RTYPE_NONE != info->recipes[r].type) {
                   info->current_recipe_index = r;
                   ba_printf("Running recipe: %s\n", info->recipes[info->current_recipe_index].name);
                   benchapp_test_runner(info);

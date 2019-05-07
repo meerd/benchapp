@@ -10,6 +10,7 @@ include_directories(${APP_NAME} ${CMAKE_SOURCE_DIR}/external/WjCryptLib/lib)
 add_executable(${APP_NAME}                
                 main.c
                 ba_md5.c
+                ba_aes.c
                 ba_port.c
 )
 

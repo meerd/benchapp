@@ -64,14 +64,10 @@ int benchapp_run_MD5(void *arg)
 
 void* benchapp_init_MD5(void)
 {
-    /* Config */
-    /* Config */
-
     md5_test_info_t *info = (md5_test_info_t *) ba_malloc(sizeof(md5_test_info_t));
 
     if (info) {
         ba_strcpy(info->c.name, "MD5");
-
         info->c.runner = &benchapp_run_MD5;
 
         info->curr_block_index = 0;
