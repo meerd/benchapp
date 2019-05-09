@@ -19,7 +19,9 @@
 #define CSTR(a) BCSTR(a)
 #define BCSTR(a) #a
 
-#ifndef RELEASE_MODE
+/* DEBUG_MESSAGES */
+
+#ifdef DEBUG_MESSAGES
 #define benchapp_logf(...) do { \
                             const char *f = __FILE__; \
                             const char *p = ba_strrchr(f, '/'); \

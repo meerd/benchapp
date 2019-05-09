@@ -5,7 +5,9 @@ CMAKE_STD_BUILD=mkdir -p build/ && cd build/ && cmake .. && make
 .PHONY: all b_prepare b_config wjcryptlib menuconfig menuconfig_build run
 
 all: b_config wjcryptlib
-	(mkdir -p build/ && cd build/ && cmake -DBENCHAPP_CONFIG='$(BENCHAPP_CONFIG)' .. && make)
+	(mkdir -p build/ && cd build/ && \
+	 cmake -DBENCHAPP_CONFIG='$(BENCHAPP_CONFIG)' -DCONFIG_BENCHMARK_MD5='$(CONFIG_BENCHMARK_MD5)' -DCONFIG_BENCHMARK_AES='$(CONFIG_BENCHMARK_AES)' -DCONFIG_BENCHMARK_SHA='$(CONFIG_BENCHMARK_SHA)' .. && \
+	make)
 
 b_prepare:
 	cd $(WORKING_DIRECTORY)
@@ -14,7 +16,7 @@ b_prepare:
 b_config: b_prepare
 include .config
 $(foreach v, $(filter CONFIG_%,$(.VARIABLES)), $(eval BENCHAPP_CONFIG += -D$(v)=$($(v))))
-#$(info $(BENCHAPP_CONFIG))
+$(foreach v, $(filter CONFIG_%,$(.VARIABLES)), $(eval $(v)=$($(v))))
 
 wjcryptlib:	
 	(cd $(WORKING_DIRECTORY)/external/WjCryptLib && $(CMAKE_STD_BUILD))

@@ -7,12 +7,28 @@ message(STATUS "CONFIG " ${BENCHAPP_CONFIG})
 
 include_directories(${APP_NAME} ${CMAKE_SOURCE_DIR}/external/WjCryptLib/lib)
 
-add_executable(${APP_NAME}                
-                main.c
-                ba_md5.c
-                ba_aes.c
-                ba_port.c
-)
+set(SOURCE_FILES main.c ba_port.c)
+
+IF (DEFINED CONFIG_BENCHMARK_MD5)
+IF ("${CONFIG_BENCHMARK_MD5}" STREQUAL "y")
+set(SOURCE_FILES ${SOURCE_FILES} ba_md5.c)
+ENDIF ()
+ENDIF(DEFINED CONFIG_BENCHMARK_MD5)
+
+IF (DEFINED CONFIG_BENCHMARK_AES)
+IF ("${CONFIG_BENCHMARK_AES}" STREQUAL "y")
+set(SOURCE_FILES ${SOURCE_FILES} ba_aes.c)
+ENDIF ()
+ENDIF(DEFINED CONFIG_BENCHMARK_AES)
+
+IF (DEFINED CONFIG_BENCHMARK_SHA)
+IF ("${CONFIG_BENCHMARK_SHA}" STREQUAL "y")
+set(SOURCE_FILES ${SOURCE_FILES} ba_sha.c)
+ENDIF ()
+ENDIF(DEFINED CONFIG_BENCHMARK_SHA)
+
+
+add_executable(${APP_NAME} ${SOURCE_FILES})
 
 target_link_libraries(${APP_NAME} ${CMAKE_SOURCE_DIR}/external/WjCryptLib/build/libWjCryptLib.a)
 

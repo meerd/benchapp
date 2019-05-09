@@ -25,3 +25,4 @@ endchoice
 
 source "Config.md5"
 source "Config.aes"
+source "Config.sha"

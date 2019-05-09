@@ -2,6 +2,7 @@
 
 INCLUDE_TEST(MD5);
 INCLUDE_TEST(AES);
+INCLUDE_TEST(SHA);
 
 benchapp_init_t init_calls[] = {
     0
@@ -13,6 +14,9 @@ benchapp_init_t init_calls[] = {
     , &benchapp_init_AES
 #endif
 
+#ifdef CONFIG_BENCHMARK_SHA
+    , &benchapp_init_SHA
+#endif
 };
 
 benchapp_uninit_t uninit_calls[] = {
@@ -23,6 +27,10 @@ benchapp_uninit_t uninit_calls[] = {
 
 #ifdef CONFIG_BENCHMARK_AES
     , &benchapp_uninit_AES
+#endif
+
+#ifdef CONFIG_BENCHMARK_SHA
+    , &benchapp_uninit_SHA
 #endif
 
 };
@@ -140,7 +148,6 @@ int main(void)
               /* Recipes */
               run_recipes(info);
           }
-          ba_printf("######################################\n");
           uninit_calls[i](info);
       }
   }
