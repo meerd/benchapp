@@ -1,0 +1,144 @@
+menu "AES Benchmark"
+
+config BENCHMARK_AES
+    bool "Enable AES Benchmark"
+    default y
+
+#--------------------------------
+
+config BENCHMARK_AES_VARIATION_128B
+    bool "Enable AES128 Tests"
+    default y
+    depends on BENCHMARK_AES
+
+config BENCHMARK_AES_VARIATION_192B
+    bool "Enable AES192 Tests"
+    default y
+    depends on BENCHMARK_AES
+
+config BENCHMARK_AES_VARIATION_256B
+    bool "Enable AES256 Tests"
+    default y
+    depends on BENCHMARK_AES
+
+config BENCHMARK_AES_DATA_RANDOMISATION
+    bool "Data Randomisation (Refresh input data in each cycle (SLOWER))"
+    default n
+    depends on BENCHMARK_AES
+
+config BENCHMARK_AES_TEST_DATA_SIZE
+    int "Test Data Size"
+    default 1048576
+    depends on BENCHMARK_AES
+
+config BENCHMARK_AES_RECIPE1
+    bool "Enable test recipe 1"
+    default y
+    depends on BENCHMARK_AES
+
+config BENCHMARK_AES_R1_NAME
+    string "Name"
+    default "AES-1"
+    depends on BENCHMARK_AES_RECIPE1
+
+choice
+    prompt "Recipe-1 Type"
+    depends on BENCHMARK_AES_RECIPE1
+    default BENCHMARK_AES_R1_TIME_LIMITED
+    help
+        Time Limited:
+        Execution Limited:
+
+config BENCHMARK_AES_R1_TIME_LIMITED:
+    bool "Time Limited"
+
+config BENCHMARK_AES_R1_EXEC_LIMITED:
+    bool "Execution Limited"
+
+endchoice 
+
+config BENCHMARK_AES_RECIPE1_TIME
+    int "Time Limit (msecs)"
+    default 1000
+    depends on BENCHMARK_AES_RECIPE1 && BENCHMARK_AES_R1_TIME_LIMITED
+
+config BENCHMARK_AES_RECIPE1_CALLS
+    int "Exec Limit (cals)"
+    default 10000
+    depends on BENCHMARK_AES_RECIPE1 && BENCHMARK_AES_R1_EXEC_LIMITED
+    
+#--------------------------------
+
+config BENCHMARK_AES_RECIPE2
+    bool "Enable test recipe 2"
+    default y
+    depends on BENCHMARK_AES
+
+config BENCHMARK_AES_R2_NAME
+    string "Name"
+    default "AES-2"
+    depends on BENCHMARK_AES_RECIPE2
+
+choice
+    prompt "Recipe-2 Type"
+    depends on BENCHMARK_AES_RECIPE2
+    default BENCHMARK_AES_R2_EXEC_LIMITED
+    help
+        Time Limited:
+        Execution Limited:
+
+config BENCHMARK_AES_R2_TIME_LIMITED:
+    bool "Time Limited"
+
+config BENCHMARK_AES_R2_EXEC_LIMITED:
+    bool "Execution Limited"
+
+endchoice 
+
+config BENCHMARK_AES_RECIPE2_TIME
+    int "Time Limit (msecs)"
+    default 1000
+    depends on BENCHMARK_AES_RECIPE2 && BENCHMARK_AES_R2_TIME_LIMITED
+
+config BENCHMARK_AES_RECIPE2_CALLS
+    int "Exec Limit (cals)"
+    default 10000
+    depends on BENCHMARK_AES_RECIPE2 && BENCHMARK_AES_R2_EXEC_LIMITED
+
+#--------------------------------
+
+config BENCHMARK_AES_RECIPE3
+    bool "Enable test recipe 3"
+    default n
+    depends on BENCHMARK_AES
+
+config BENCHMARK_AES_R3_NAME
+    string "Name"
+    default "AES-3"
+    depends on BENCHMARK_AES_RECIPE3
+
+choice
+    prompt "Recipe-3 Type"
+    depends on BENCHMARK_AES_RECIPE3
+    help
+        Time Limited:
+        Execution Limited:
+
+config BENCHMARK_AES_R3_TIME_LIMITED:
+    bool "Time Limited"
+
+config BENCHMARK_AES_R3_EXEC_LIMITED:
+    bool "Execution Limited"
+
+endchoice 
+
+config BENCHMARK_AES_RECIPE3_TIME
+    int "Time Limit (msecs)"
+    depends on BENCHMARK_AES_RECIPE3 && BENCHMARK_AES_R3_TIME_LIMITED
+
+config BENCHMARK_AES_RECIPE3_CALLS
+    int "Exec Limit (cals)"
+    depends on BENCHMARK_AES_RECIPE3 && BENCHMARK_AES_R3_EXEC_LIMITED
+    
+endmenu
+

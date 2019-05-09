@@ -4,13 +4,27 @@ INCLUDE_TEST(MD5);
 INCLUDE_TEST(AES);
 
 benchapp_init_t init_calls[] = {
-    &benchapp_init_MD5,
-    &benchapp_init_AES
+    0
+#ifdef CONFIG_BENCHMARK_MD5
+    , &benchapp_init_MD5
+#endif
+
+#ifdef CONFIG_BENCHMARK_AES
+    , &benchapp_init_AES
+#endif
+
 };
 
 benchapp_uninit_t uninit_calls[] = {
-    &benchapp_uninit_MD5,
-    &benchapp_init_AES
+   0
+#ifdef CONFIG_BENCHMARK_MD5
+    , &benchapp_uninit_MD5
+#endif
+
+#ifdef CONFIG_BENCHMARK_AES
+    , &benchapp_uninit_AES
+#endif
+
 };
 
 static int failures = 0;
@@ -103,7 +117,7 @@ static void run_recipes(test_info_common_t *info)
 int main(void)
 {
   ba_printf("|*************************************|\n");
-  ba_printf("          Bencapp has started!\n");
+  ba_printf("          Benchapp has started!\n");
   ba_register_on_exit_callback(app_exit);
 
   for (int i = 0; i < sizeof(init_calls) / sizeof(init_calls[0]); ++i) {

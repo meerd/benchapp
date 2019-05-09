@@ -1,10 +1,6 @@
 #include "benchapp.h"
 #include "WjCryptLib_Aes.h"
 #include "WjCryptLib_AesCbc.h"
-#include "WjCryptLib_AesCtr.h"
-#include "WjCryptLib_AesOfb.h"
-
-#define AES_KEYSIZE_TYPE_COUNT  3
 
 typedef struct {
   test_info_common_t c;
@@ -67,7 +63,7 @@ int benchapp_run_AES(void *arg)
 
   case TEST_STATE_RUN:
     {
-#if 0
+#if CONFIG_BENCHMARK_AES_DATA_RANDOMISATION
       for (int i = 0; i < info->data_size; ++i)
           info->data[i] = ba_rand() % 256;
 #else
@@ -106,7 +102,7 @@ void* benchapp_init_AES(void)
         ba_strcpy(info->c.name, "AES");
         info->c.runner = &benchapp_run_AES;
 
-        info->data_size  = (1024 * 1024);
+        info->data_size  = CONFIG_BENCHMARK_AES_TEST_DATA_SIZE;
         info->data = ba_malloc(info->data_size);
         info->encrypted = ba_malloc(info->data_size);
         info->decrypted = ba_malloc(info->data_size);
@@ -121,27 +117,56 @@ void* benchapp_init_AES(void)
         ba_memset(info->c.variation_names, 0x00, sizeof(info->c.variation_names));
 
         info->c.curr_variation_index = 0;
-        info->c.nb_variations = 3;
+        info->c.nb_variations = 0;
+
+#ifdef CONFIG_BENCHMARK_AES_VARIATION_128B
         info->c.variations[0] = 1;
         ba_strcpy(info->c.variation_names[0], "128 Bit");
+        ++info->c.nb_variations;
+#endif
+
+#ifdef CONFIG_BENCHMARK_AES_VARIATION_192B
         info->c.variations[1] = 1;
         ba_strcpy(info->c.variation_names[1], "192 Bit");
+        ++info->c.nb_variations;
+#endif
+
+#ifdef CONFIG_BENCHMARK_AES_VARIATION_256B
         info->c.variations[2] = 1;
         ba_strcpy(info->c.variation_names[2], "256 Bit");
+        ++info->c.nb_variations;
+#endif
 
         ba_memset(info->recipes, 0x00, sizeof(info->recipes));
         info->c.recipes = info->recipes;
         info->c.current_recipe_index = 0;
         info->c.max_recipe = 0;
 
-        ba_strcpy(info->recipes[info->c.max_recipe].name, "AES Time Limited");
+#ifdef CONFIG_BENCHMARK_AES_RECIPE1
+#ifdef CONFIG_BENCHMARK_AES_R1_TIME_LIMITED
+        ba_strcpy(info->recipes[info->c.max_recipe].name, CSTR(CONFIG_BENCHMARK_AES_R1_NAME));
         info->recipes[info->c.max_recipe].type = RTYPE_TIME_LIMITED;
-        info->recipes[info->c.max_recipe].duration = 5000 * 1000;
-        ++info->c.max_recipe;
-        ba_strcpy(info->recipes[info->c.max_recipe].name, "AES Execution Limited");
+        info->recipes[info->c.max_recipe].duration = CONFIG_BENCHMARK_AES_RECIPE1_TIME * 1000;
+#else
+        ba_strcpy(info->recipes[info->c.max_recipe].name, CSTR(CONFIG_BENCHMARK_AES_R1_NAME));
         info->recipes[info->c.max_recipe].type = RTYPE_EXECUTION_LIMITED;
-        info->recipes[info->c.max_recipe].max_cycle = 1000;
+        info->recipes[info->c.max_recipe].max_cycle = CONFIG_BENCHMARK_AES_RECIPE1_CALLS;
+#endif
         ++info->c.max_recipe;
+#endif
+
+#ifdef CONFIG_BENCHMARK_AES_RECIPE2
+#ifdef CONFIG_BENCHMARK_AES_R2_TIME_LIMITED
+        ba_strcpy(info->recipes[info->c.max_recipe].name, CSTR(CONFIG_BENCHMARK_AES_R2_NAME));
+        info->recipes[info->c.max_recipe].type = RTYPE_TIME_LIMITED;
+        info->recipes[info->c.max_recipe].duration = CONFIG_BENCHMARK_AES_RECIPE2_TIME * 1000;
+#else
+        ba_strcpy(info->recipes[info->c.max_recipe].name, CSTR(CONFIG_BENCHMARK_AES_R2_NAME));
+        info->recipes[info->c.max_recipe].type = RTYPE_EXECUTION_LIMITED;
+        info->recipes[info->c.max_recipe].max_cycle = CONFIG_BENCHMARK_AES_RECIPE2_CALLS;
+#endif
+        ++info->c.max_recipe;
+#endif
     }
 
     return info;
